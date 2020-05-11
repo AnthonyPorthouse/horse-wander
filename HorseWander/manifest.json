@@ -1,7 +1,7 @@
 ﻿{
   "Name": "Horse Wander",
   "Author": "Anthony Porthouse",
-  "Version": "0.1.0",
+  "Version": "0.1.1",
   "Description": "Let your horse just move about freely when you're not mounted.",
   "UniqueID": "se.porthou.HelloWorld",
   "EntryDll": "HorseWander.dll",
