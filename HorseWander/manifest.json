@@ -6,5 +6,5 @@
   "UniqueID": "se.porthou.HelloWorld",
   "EntryDll": "HorseWander.dll",
   "MinimumApiVersion": "2.10.0",
-  "UpdateKeys": []
+  "UpdateKeys": ["GitHub:AnthonyPorthouse/horse-wander"]
 }
