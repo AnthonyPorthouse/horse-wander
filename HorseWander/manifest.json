@@ -4,7 +4,7 @@
   "Version": "0.1.0",
   "Description": "Let your horse just move about freely when you're not mounted.",
   "UniqueID": "se.porthou.HelloWorld",
-  "EntryDll": "HelloWorld.dll",
+  "EntryDll": "HorseWander.dll",
   "MinimumApiVersion": "2.10.0",
   "UpdateKeys": []
 }

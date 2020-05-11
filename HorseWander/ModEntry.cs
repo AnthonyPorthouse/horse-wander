@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -38,11 +39,16 @@ namespace HelloWorld
                 if (e.Ticks % nextMove == 0 && !isWandering)
                 {
                     moveDirection = (Direction)Game1.random.Next(0, 4);
-                    ticksToMove = Game1.random.Next(30, 91);
+                    ticksToMove = Game1.random.Next(120, 300);
+
+                    var path = new List<Vector2>();
+
+                    var curpos = (horse.getStandingPosition());
 
                     monitor.Log($"Moving {horse.getName()} {(Direction)moveDirection} for {ticksToMove}", LogLevel.Debug);
                     horse.faceDirection((int)moveDirection);
                     SetHorseDirection(horse, moveDirection);
+                    horse.Sprite.StopAnimation();
                     horse.animateInFacingDirection(Game1.currentGameTime);
                     horse.Sprite.ignoreStopAnimation = true;
                     isWandering = true;
@@ -99,6 +105,7 @@ namespace HelloWorld
                     return;
             }
         }
+
     }
 
     /// <summary>The mod entry point.</summary>
