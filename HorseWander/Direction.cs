@@ -1,4 +1,4 @@
-﻿namespace HelloWorld
+﻿namespace HorseWander
 {
     public enum Direction
     {

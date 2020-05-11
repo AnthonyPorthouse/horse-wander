@@ -1,96 +1,121 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using StardewModdingAPI;
+﻿using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Characters;
 
-namespace HelloWorld
+namespace HorseWander
 {
     public class HorseStatus
     {
-        private Horse horse;
-        private int ticksToMove = 0;
-        private Direction moveDirection = Direction.Up;
-        private int nextMove = 1;
-        private bool isWandering = false;
-        private IMonitor monitor;
+        private Horse _horse;
+        private int _ticksToMove;
+        private Direction _moveDirection = Direction.Up;
+        private bool _isWandering;
+        private IMonitor _monitor;
+
+        private double _chanceToMove = 0.001d;
 
         public HorseStatus(IMonitor monitor, Horse horse)
         {
-            this.monitor = monitor;
-            this.horse = horse;
+            this._monitor = monitor;
+            this._horse = horse;
         }
 
         public void OnUpdateTicking(object sender, UpdateTickingEventArgs e)
         {
-            if (horse.rider == null)
+            if (_horse.rider == null)
             {
-                if (e.Ticks % nextMove == 0 && !isWandering)
+                if (Game1.random.NextDouble() < _chanceToMove && !_isWandering)
                 {
-                    moveDirection = (Direction)Game1.random.Next(0, 4);
-                    ticksToMove = Game1.random.Next(120, 300);
+                    _moveDirection = (Direction)Game1.random.Next(0, 4);
+                    _ticksToMove = Game1.random.Next(120, 300);
 
-                    monitor.Log($"Moving {horse.getName()} {(Direction)moveDirection} for {ticksToMove}", LogLevel.Debug);
-                    horse.faceDirection((int)moveDirection);
-                    SetHorseDirection(horse, moveDirection);
-                    horse.Sprite.StopAnimation();
-                    horse.animateInFacingDirection(Game1.currentGameTime);
-                    horse.Sprite.ignoreStopAnimation = true;
-                    isWandering = true;
+                    _monitor.Log($"Moving {_horse.getName()} {_moveDirection} for {_ticksToMove}", LogLevel.Debug);
+                    _horse.faceDirection((int)_moveDirection);
+                    SetHorseDirection(_horse, _moveDirection);
+                    _horse.Sprite.StopAnimation();
+                    _horse.Sprite.ignoreStopAnimation = true;
+                    _horse.Sprite.loop = true;
+                    _horse.Sprite.framesPerAnimation = 7;
+                    _horse.Sprite.CurrentFrame = 0;
+                    _isWandering = true;
                 }
 
-                if (ticksToMove == 0 && isWandering)
+                if (_ticksToMove == 0 && _isWandering)
                 {
-                    horse.Sprite.ignoreStopAnimation = false;
-                    horse.Sprite.StopAnimation();
-                    nextMove = Game1.random.Next(300, 3001);
-                    isWandering = false;
+                    StopHorse();
                 }
 
-                if (ticksToMove > 0 && isWandering)
+                if (_ticksToMove > 0 && _isWandering)
                 {
-                    horse.faceDirection((int)moveDirection);
-                    horse.animateInFacingDirection(Game1.currentGameTime);
-                    horse.tryToMoveInDirection((int)moveDirection, false, 0, false);
-                    //horse.MovePosition(Game1.currentGameTime, Game1.viewport, Game1.currentLocation);
-                    ticksToMove--;
+                    if (_horse.currentLocation.isCollidingPosition(
+                        _horse.nextPosition(_horse.getDirection()),
+                        Game1.viewport,
+                        false,
+                        0,
+                        false,
+                        _horse
+                    ))
+                    {
+                        _monitor.Log("Bonk! Stopping wandering.", LogLevel.Debug);
+
+                        StopHorse();
+                        return;
+                    }
+
+                    //target.faceDirection((int)moveDirection);
+                    _horse.animateInFacingDirection(Game1.currentGameTime);
+                    _horse.tryToMoveInDirection(_horse.getDirection(), false, 0, false);
+                    if (_moveDirection == Direction.Left)
+                    {
+                        _horse.flip = true;
+                    }
+                    //target.MovePosition(Game1.currentGameTime, Game1.viewport, Game1.currentLocation);
+                    _ticksToMove--;
                 }
             }
             else
             {
-                ticksToMove = 0;
-                isWandering = false;
-                horse.Sprite.ignoreStopAnimation = false;
+                _ticksToMove = 0;
+                _isWandering = false;
+                _horse.Sprite.ignoreStopAnimation = false;
             }
         }
 
         public void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            if (isWandering)
+            if (_isWandering)
             {
-                horse.faceDirection((int)moveDirection);
+                _horse.animateInFacingDirection(Game1.currentGameTime);
             }
         }
 
-        private void SetHorseDirection(Horse horse, Direction direction)
+        private void SetHorseDirection(Horse target, Direction direction)
         {
             switch (direction)
             {
                 case Direction.Up:
-                    horse.SetMovingOnlyUp();
+                    target.SetMovingOnlyUp();
                     return;
                 case Direction.Right:
-                    horse.SetMovingOnlyRight();
+                    target.SetMovingOnlyRight();
                     return;
                 case Direction.Down:
-                    horse.SetMovingOnlyDown();
+                    target.SetMovingOnlyDown();
                     return;
                 case Direction.Left:
-                    horse.SetMovingOnlyLeft();
+                    target.SetMovingOnlyLeft();
                     return;
             }
         }
 
+        private void StopHorse()
+        {
+            _horse.Sprite.loop = false;
+            _horse.Sprite.ignoreStopAnimation = false;
+            _horse.Sprite.StopAnimation();
+            _horse.Sprite.CurrentFrame = 0;
+            _isWandering = false;
+        }
     }
 }

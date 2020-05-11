@@ -6,7 +6,7 @@ using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Characters;
 
-namespace HelloWorld
+namespace HorseWander
 {
     /// <summary>The mod entry point.</summary>
     public class ModEntry : Mod
