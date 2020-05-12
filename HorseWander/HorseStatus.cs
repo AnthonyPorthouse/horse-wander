@@ -7,28 +7,35 @@ namespace HorseWander
 {
     public class HorseStatus
     {
+        private IMonitor _monitor;
+
+        private double _moveChance;
+        private int _moveMin;
+        private int _moveMax;
+
         private Horse _horse;
         private int _ticksToMove;
         private Direction _moveDirection = Direction.Up;
         private bool _isWandering;
-        private IMonitor _monitor;
 
-        private double _chanceToMove = 0.001d;
-
-        public HorseStatus(IMonitor monitor, Horse horse)
+        public HorseStatus(IMonitor monitor, ModConfig config, Horse horse)
         {
-            this._monitor = monitor;
-            this._horse = horse;
+            _monitor = monitor;
+            _horse = horse;
+
+            _moveChance = config.GetWanderFrequency();
+            _moveMin = config.GetWanderRange().Item1;
+            _moveMax = config.GetWanderRange().Item2;
         }
 
         public void OnUpdateTicking(object sender, UpdateTickingEventArgs e)
         {
             if (_horse.rider == null)
             {
-                if (Game1.random.NextDouble() < _chanceToMove && !_isWandering)
+                if (Game1.random.NextDouble() < _moveChance && !_isWandering)
                 {
                     _moveDirection = (Direction)Game1.random.Next(0, 4);
-                    _ticksToMove = Game1.random.Next(120, 300);
+                    _ticksToMove = Game1.random.Next(_moveMin, _moveMax);
 
                     _monitor.Log($"Moving {_horse.getName()} {_moveDirection} for {_ticksToMove}", LogLevel.Debug);
                     _horse.faceDirection((int)_moveDirection);

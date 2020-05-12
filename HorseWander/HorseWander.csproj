@@ -35,6 +35,7 @@
     <Compile Include="ModEntry.cs" />
     <Compile Include="Direction.cs" />
     <Compile Include="HorseStatus.cs" />
+    <Compile Include="ModConfig.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

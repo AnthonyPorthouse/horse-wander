@@ -12,6 +12,7 @@ namespace HorseWander
     public class ModEntry : Mod
     {
         private Dictionary<Guid, HorseStatus> horses = new Dictionary<Guid, HorseStatus>();
+        private ModConfig config;
 
         /*********
         ** Public methods
@@ -20,6 +21,8 @@ namespace HorseWander
         /// <param name="helper">Provides simplified APIs for writing mods.</param>
         public override void Entry(IModHelper helper)
         {
+            config = helper.ReadConfig<ModConfig>();
+
             helper.Events.GameLoop.ReturnedToTitle += OnReturnedToTitle;
             helper.Events.GameLoop.DayStarted += OnDayStarted;
             helper.Events.GameLoop.UpdateTicking += OnUpdateTicking;
@@ -105,7 +108,7 @@ namespace HorseWander
                 {
                     this.Monitor.Log($"Found Horse: {horse.getName()}", LogLevel.Debug);
 
-                    horses.Add(horse.HorseId, new HorseStatus(Monitor, horse));
+                    horses.Add(horse.HorseId, new HorseStatus(Monitor, config, horse));
                 }
             }
         }
